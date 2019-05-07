@@ -3,10 +3,13 @@ import { ScrollView, StyleSheet, FlatList, ActivityIndicator, View, Text } from 
 import { SearchBar, ListItem } from 'react-native-elements';
 import routes from '../constants/Routes';
 
-export default class LinksScreen extends React.Component {
+export default class CountriesSelectionScreen extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { loading: true, searchText: "", countries: [], filteredResults: [] }
+    this.state = {
+      loading: true, searchText: "", countries: [], filteredResults: [],
+      error: "",
+    }
   }
 
   componentDidMount() {
@@ -17,11 +20,19 @@ export default class LinksScreen extends React.Component {
     fetch(`${routes.url}?APIkey=${routes.apiKey}&action=get_countries`)
       .then(response => response.json())
       .then(parsedJson => this.setState({ countries: parsedJson, loading: false, filteredResults: parsedJson }))
-      .catch(error => { })
+      .catch(error => this.setState({ error, loading: false }))
   }
 
   static navigationOptions = {
     title: 'Select a country',
+    headerStyle: {
+      backgroundColor: 'black'
+    },
+    headerTintColor: 'white',
+    headerTitleStyle: {
+      fontWeight: 'bold',
+      color: 'white'
+    },
   };
 
   render() {
@@ -33,15 +44,20 @@ export default class LinksScreen extends React.Component {
       )
     }
 
-
+    if (this.state.error) {
+      return (
+        <View style={styles.loadingContainer}>
+          <Text>{this.state.error.message}</Text>
+        </View>
+      )
+    }
 
     return (
       <ScrollView style={styles.container}>
         <SearchBar
           placeholder="Type here..."
-          onChangeText={text => { this.setState({ searchSpinner: true }), this.onChangeTextSearchBar(text) }}
+          onChangeText={text => this.onChangeTextSearchBar(text)}
           value={this.state.searchText}
-          showLoading={this.state.searchSpinner}
         />
         {this.renderData()}
       </ScrollView>
@@ -68,7 +84,7 @@ export default class LinksScreen extends React.Component {
 
   onChangeTextSearchBar = (searchText) => {
     const filtered = this.state.countries.filter(c => c.country_name.includes(searchText));
-    this.setState({ filteredResults: filtered, searchText, searchSpinner: false });
+    this.setState({ filteredResults: filtered, searchText });
   }
 
   renderItem = ({ item }) => {
@@ -77,9 +93,17 @@ export default class LinksScreen extends React.Component {
         title={item.country_name}
         chevron={true}
         bottomDivider
-        onPress={this.onListItemPress}
+        onPress={() => this.onListItemPress(item)}
       />
     )
+  }
+
+  onListItemPress = (item) => {
+    const { country_id, country_name } = item;
+    this.props.navigation.navigate('Leagues', {
+      country_id,
+      country_name
+    })
   }
 }
 

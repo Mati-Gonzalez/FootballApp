@@ -6,6 +6,7 @@ import TabBarIcon from '../components/TabBarIcon';
 import HomeScreen from '../screens/HomeScreen';
 import CountriesSelectionScreen from '../screens/CountriesSelectionScreen';
 import SettingsScreen from '../screens/SettingsScreen';
+import LeaguesSelectionScreen from '../screens/LeaguesSelectionScreen'
 
 const HomeStack = createStackNavigator({
   Home: HomeScreen,
@@ -18,23 +19,24 @@ HomeStack.navigationOptions = {
       focused={focused}
       name={
         Platform.OS === 'ios'
-          ? `ios-information-circle${focused ? '' : '-outline'}`
-          : 'md-information-circle'
+          ? `ios-home${focused ? '' : '-outline'}`
+          : 'md-home'
       }
     />
   ),
 };
 
-const LinksStack = createStackNavigator({
-  Links: CountriesSelectionScreen,
+const FootballStack = createStackNavigator({
+  Countries: CountriesSelectionScreen,
+  Leagues: LeaguesSelectionScreen
 });
 
-LinksStack.navigationOptions = {
-  tabBarLabel: 'Links',
+FootballStack.navigationOptions = {
+  tabBarLabel: 'Football',
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
-      name={Platform.OS === 'ios' ? 'ios-link' : 'md-link'}
+      name={Platform.OS === 'ios' ? 'ios-football' : 'md-football'}
     />
   ),
 };
@@ -55,6 +57,6 @@ SettingsStack.navigationOptions = {
 
 export default createBottomTabNavigator({
   HomeStack,
-  LinksStack,
+  FootballStack,
   SettingsStack,
 });
